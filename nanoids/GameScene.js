@@ -29,18 +29,18 @@ export class GameScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, 3200, 600).setName('main');
 
         //  The miniCam is 400px wide, so can display the whole world at a zoom of 0.2
-        this.minimap = this.cameras.add(this.game.config.width/2 - 200, 10, 400, 100).setZoom(0.2).setName('mini');
+        this.minimap = this.cameras.add(this.game.config.width/2 - 200, 10, 400, 120).setZoom(0.2).setName('mini');
         this.minimap.setBackgroundColor(0x000019);
         this.minimap.scrollX = 1600;
         this.minimap.scrollY = 300;
 
         this.createStarfield();
-        this.createLandscape();
+        this.addBackgroundElements();
         this.createAliens();
         this.nanoTransaction();
 
         //  Add a player ship and camera follow
-        this.player = this.matter.add.sprite(1600, 200, 'ship')
+        this.player = this.matter.add.sprite(1600, 200, 'shipStandby')
             .setFixedRotation()
             .setFrictionAir(0.05)
             .setMass(30);
@@ -54,24 +54,51 @@ export class GameScene extends Phaser.Scene {
         {
             this.player.thrustBack(0.1);
             this.player.flipX = true;
+            this.player.setTexture('shipMoving');
         }
         else if (this.cursors.right.isDown)
         {
             this.player.thrust(0.1);
             this.player.flipX = false;
+            this.player.setTexture('shipMoving');
         }
         if (this.cursors.up.isDown)
         {
             this.player.thrustLeft(0.1);
+            this.player.setTexture('shipMoving');
         }
         else if (this.cursors.down.isDown)
         {
             this.player.thrustRight(0.1);
+            this.player.setTexture('shipMoving');
+        }
+
+        else if(!this.cursors.left.isDown && !this.cursors.right.isDown && !this.cursors.up.isDown && !this.cursors.down.isDown) {
+            this.player.setTexture('shipStandby');
         }
         //  And this camera is 400px wide, so -200
         this.minimap.scrollX = Phaser.Math.Clamp(this.player.x - 200, 800, 2000);
 
         nanoCount.setText("Confirmed Transactions: " + transactionsArray.length);
+
+    }
+
+    addBackgroundElements() {
+
+        var planetOne = this.add.image(this.game.config.width/2, this.game.config.height/4, 'planetOne');
+        planetOne.setScrollFactor(.2);
+
+        var planetTwo = this.add.image(this.game.config.width + 300, 150, 'planetTwo');
+        planetTwo.setScrollFactor(.2);
+
+        var floatingLandscapeOne = this.add.image(300, 300, 'floatingLandscapeOne');
+        floatingLandscapeOne.setScrollFactor(.7);
+
+        var floatingLandscapeTwo = this.add.image(2400, 300, 'floatingLandscapeTwo');
+        floatingLandscapeTwo.setScrollFactor(.7);
+
+        var frontScenery = this.add.image(-200, 150, 'frontScenery').setOrigin(0, 0);
+        frontScenery.setScrollFactor(.9);
 
     }
 
@@ -105,59 +132,6 @@ export class GameScene extends Phaser.Scene {
         }, this);
     }
 
-    createLandscape ()
-    {
-        //  Draw a random 'landscape'
-
-        var landscape = this.add.graphics();
-
-        landscape.fillStyle(0x4A90E2, 1);
-
-
-        landscape.beginPath();
-
-        var maxY = 550;
-        var minY = 400;
-
-        var x = 0;
-        var y = maxY;
-        var range = 0;
-
-        var up = true;
-
-        landscape.moveTo(0, 700);
-        landscape.lineTo(0, 550);
-
-        do
-        {
-            //  How large is this 'side' of the mountain?
-            range = Phaser.Math.Between(20, 100);
-
-            if (up)
-            {
-                y = Phaser.Math.Between(y, minY);
-                up = false;
-            }
-            else
-            {
-                y = Phaser.Math.Between(y, maxY);
-                up = true;
-            }
-
-            landscape.lineTo(x + range, y);
-
-            x += range;
-
-        } while (x < 3100);
-
-        landscape.lineTo(3200, maxY);
-        landscape.lineTo(3200, 700);
-        landscape.closePath();
-
-        landscape.strokePath();
-        landscape.fillPath();
-    }
-
     createAliens ()
     {
         //  Create some random aliens
@@ -187,8 +161,8 @@ export class GameScene extends Phaser.Scene {
 
     nanoTransaction() {
 
-        nanoCount = this.add.text(25, this.game.config.height - 60, 'Confirmed: 0', { font: "32px Arial", fill: "#ffffff", align: "left" }).setScrollFactor(0);
-        nanoTSXCount = this.add.text(600, this.game.config.height - 60, 'Confirmed TPS: 0', { font: "32px Arial", fill: "#ffffff", align: "left" }).setScrollFactor(0);
+        nanoCount = this.add.text(25, this.game.config.height - 60, 'Confirmed: 0', { font: "16px Arial", fill: "#ffffff", align: "left" }).setScrollFactor(0);
+        nanoTSXCount = this.add.text(600, this.game.config.height - 60, 'Confirmed TPS: 0', { font: "16px Arial", fill: "#ffffff", align: "left" }).setScrollFactor(0);
 
         var countTSX = setInterval(this.countPerSecond, 1000);
 

@@ -23,14 +23,14 @@ config = {
             enableSleeping: true
         }
     },
-
+    resolution: window.devicePixelRatio,
     scale: {
         parent: 'game-container',
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: window.innerWidth * 2,
-	    height: window.innerHeight * 2,
-        zoom: 1 /*/ window.devicePixelRatio */ // Set the zoom to the inverse of the devicePixelRatio
+        width: 1600,
+	    height: 900,
+        
     },
     dom: {
         createContainer: true
